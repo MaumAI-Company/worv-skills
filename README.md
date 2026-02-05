@@ -17,6 +17,96 @@ cp -r worv-skills/skills/[skill-name] ~/.claude/skills/
 git clone https://github.com/MaumAI-Company/worv-skills.git ~/.claude/plugins/worv-skills
 ```
 
+## 환경변수 설정
+
+스킬마다 필요한 API 키와 설정이 다릅니다. `.env.sample`을 참고하여 `~/.claude/.env` 파일을 생성하세요.
+
+```bash
+cp .env.sample ~/.claude/.env
+# 이후 실제 값으로 수정
+```
+
+### Google Calendar API (meeting-scheduler, calendar-reader, calendar-writer)
+
+**필요한 환경변수:**
+```bash
+GOOGLE_CALENDAR_TOKEN=~/.credentials/calendar_token.pickle
+```
+
+**토큰 발급 방법:**
+
+1. [Google Cloud Console](https://console.cloud.google.com/) 접속
+2. 새 프로젝트 생성 또는 기존 프로젝트 선택
+3. **API 및 서비스 > 라이브러리**에서 "Google Calendar API" 검색 후 **사용 설정**
+4. **API 및 서비스 > 사용자 인증 정보 > + 사용자 인증 정보 만들기 > OAuth 클라이언트 ID**
+   - 애플리케이션 유형: **데스크톱 앱**
+   - 이름: 원하는 이름 입력
+5. **OAuth 동의 화면** 설정 (처음인 경우)
+   - 사용자 유형: 내부 (조직) 또는 외부
+   - 앱 이름, 이메일 입력
+   - 범위 추가: `https://www.googleapis.com/auth/calendar`
+6. 생성된 클라이언트 ID에서 **JSON 다운로드** → `credentials.json`으로 저장
+7. 아래 스크립트 실행하여 `token.pickle` 생성:
+
+```python
+# generate_token.py
+from google_auth_oauthlib.flow import InstalledAppFlow
+
+SCOPES = ['https://www.googleapis.com/auth/calendar']
+
+flow = InstalledAppFlow.from_client_secrets_file('credentials.json', SCOPES)
+creds = flow.run_local_server(port=0)
+
+import pickle
+with open('calendar_token.pickle', 'wb') as f:
+    pickle.dump(creds, f)
+
+print("토큰 생성 완료: calendar_token.pickle")
+```
+
+```bash
+# 실행
+pip install google-auth-oauthlib
+python generate_token.py
+mv calendar_token.pickle ~/.credentials/
+```
+
+### OpenAI API (audio-transcriber)
+
+**필요한 환경변수:**
+```bash
+OPENAI_API_KEY=sk-xxx
+```
+
+**발급 방법:**
+1. [OpenAI Platform](https://platform.openai.com/) 로그인
+2. **API Keys** 메뉴에서 **Create new secret key**
+3. 생성된 키를 `.env`에 저장
+
+### Google Gemini API (gemini-image, counsel-gemini)
+
+**필요한 환경변수:**
+```bash
+GEMINI_API_KEY=xxx
+```
+
+**발급 방법:**
+1. [Google AI Studio](https://aistudio.google.com/) 접속
+2. **Get API Key** 클릭
+3. 새 키 생성 또는 기존 키 사용
+4. 생성된 키를 `.env`에 저장
+
+### 인물사전 경로 (meeting-scheduler)
+
+**필요한 환경변수:**
+```bash
+PERSON_DICTIONARY_PATH=~/obsidian/20_Areas/00_인물사전/
+```
+
+이름으로 이메일을 조회하는 기능에 사용됩니다. Obsidian 인물사전 폴더 경로를 지정하세요.
+
+---
+
 ## 스킬 목록
 
 ### 📅 캘린더 & 미팅
