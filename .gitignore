@@ -1,5 +1,6 @@
 .env
 .env.*
+!.env.sample
 *.pickle
 *.pyc
 __pycache__/
