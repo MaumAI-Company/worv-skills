@@ -146,7 +146,8 @@ curl -L -o "images/이미지명.jpg" "https://images.unsplash.com/photo-xxx?w=19
 ```json
 {
   "layout": "stats_grid",
-  "title": "FP8 Quantization (권장)\nFP8은 메모리를 35% 절감하면서 12 FPS로 가장 높은 성능을 보였습니다.",
+  "title": "FP8 Quantization (권장)",
+  "oneliner": "FP8은 메모리를 35% 절감하면서 12 FPS로 가장 높은 성능을 보였습니다.",
   "stats": [...]
 }
 ```
@@ -172,7 +173,7 @@ curl -L -o "images/이미지명.jpg" "https://images.unsplash.com/photo-xxx?w=19
     {
       "layout": "cover",
       "title": "메인 제목",
-      "subtitle": "이 발표에서는 A와 B를 비교 평가한 결과를 공유합니다.",
+      "subtitle": "A와 B를 비교 평가한 결과 공유",
       "author": "발표자",
       "date": "2026.02"
     },
@@ -183,21 +184,24 @@ curl -L -o "images/이미지명.jpg" "https://images.unsplash.com/photo-xxx?w=19
     },
     {
       "layout": "two_column",
-      "title": "비교 제목\nA는 성능이 우수하지만 비용이 높고, B는 비용이 합리적이지만 성능이 낮습니다.",
+      "title": "비교 제목",
+      "oneliner": "A는 성능이 우수하지만 비용이 높고, B는 비용이 합리적이지만 성능이 낮습니다.",
       "left": {"heading": "좌측", "items": ["항목1", "항목2"]},
       "right": {"heading": "우측", "items": ["항목1", "항목2"]}
     },
     {
       "layout": "image_text",
-      "title": "이미지 슬라이드\n제품 A는 2000 TFLOPS의 최고 성능을 제공하는 표준 플랫폼입니다.",
+      "title": "이미지 슬라이드",
+      "oneliner": "제품 A는 2000 TFLOPS의 최고 성능을 제공하는 표준 플랫폼입니다.",
       "image_path": "/absolute/path/to/images/image.png",
       "text": "설명 텍스트"
     },
     {
       "layout": "stats_grid",
-      "title": "통계 제목\nFP8은 메모리를 35% 절감하면서 12 FPS로 가장 높은 성능을 보였습니다.",
+      "title": "통계 제목",
+      "oneliner": "FP8은 메모리를 35% 절감하면서 12 FPS로 가장 높은 성능을 보였습니다.",
       "stats": [
-        {"number": "250", "label": "간결한 레이블"},
+        {"number": "250", "label": "레이블"},
         {"number": "12", "label": "FPS"}
       ]
     },
@@ -209,6 +213,12 @@ curl -L -o "images/이미지명.jpg" "https://images.unsplash.com/photo-xxx?w=19
   ]
 }
 ```
+
+**원라이너 배치 규칙:**
+- **cover**: `subtitle`로 간결하게 표현 (문장이 아닌 요약형)
+- **section**: 원라이너 불필요 (다크 배경 구분 슬라이드)
+- **기타 레이아웃**: `oneliner` 필드로 별도 지정 → 최상단 + 구분선 스타일
+- **closing**: 제목 자체가 결론 메시지 역할
 
 **레이블 작성 규칙:**
 - stats_grid 레이블은 **3글자 이내** 권장
@@ -251,13 +261,30 @@ curl -L -o "images/이미지명.jpg" "https://images.unsplash.com/photo-xxx?w=19
 
 ### 7가지 레이아웃
 
-1. **Cover** - 표지 (subtitle로 원라이너)
+1. **Cover** - 표지 (`subtitle`로 간결한 요약 표현)
 2. **Section** - 섹션 구분 (다크 배경, 원라이너 불필요)
-3. **Stats Grid** - 숫자/통계 강조 (레이블 간결하게)
-4. **Two Column** - 비교/대조
-5. **Three Column** - 기능 나열
-6. **Image + Text** - 스토리텔링 (이미지 절대경로)
-7. **Closing** - 마무리
+3. **Stats Grid** - 숫자/통계 강조 (`oneliner` + 레이블 간결하게)
+4. **Two Column** - 비교/대조 (`oneliner` 필수)
+5. **Three Column** - 기능 나열 (`oneliner` 필수)
+6. **Image + Text** - 스토리텔링 (`oneliner` + 이미지 절대경로)
+7. **Closing** - 마무리 (제목이 곧 결론 메시지)
+
+### 원라이너 배치 (컨설팅펌 스타일)
+
+콘텐츠 슬라이드의 `oneliner`는 **슬라이드 최상단**에 배치됩니다:
+- 작은 회색 폰트로 원라이너 표시
+- 원라이너 아래 얇은 구분선
+- 구분선 아래 제목 및 본문 콘텐츠
+
+```
+┌─────────────────────────────────────────┐
+│ FP8은 메모리를 35% 절감하면서...        │ ← oneliner (muted)
+├─────────────────────────────────────────┤ ← separator
+│ FP8 Quantization (권장)                 │ ← title (bold)
+│                                         │
+│ [콘텐츠 영역]                           │
+└─────────────────────────────────────────┘
+```
 
 레이아웃 상세: [`references/layouts.md`](references/layouts.md)
 
@@ -303,8 +330,9 @@ curl -L -o "images/이미지명.jpg" "https://images.unsplash.com/photo-xxx?w=19
 - [ ] 이미지 수집 및 검토 완료
 
 ### JSON 작성 시
-- [ ] 모든 콘텐츠 슬라이드에 서술형 원라이너 포함
+- [ ] 콘텐츠 슬라이드에 `oneliner` 필드로 서술형 원라이너 포함
 - [ ] 원라이너만 읽어도 전체 스토리가 이해되는지 확인
+- [ ] `title`과 `oneliner` 분리 (title에 \n 사용 금지)
 - [ ] stats_grid 레이블 3글자 이내
 - [ ] 이미지 경로는 절대경로
 - [ ] 비즈니스 표현 사용 (확신 → 가능)

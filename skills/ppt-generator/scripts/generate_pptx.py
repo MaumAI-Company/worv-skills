@@ -45,7 +45,7 @@ PALETTES = {
         "surface": "#f8f9fc",
         "surface_foreground": "#1a1f36",
         "primary": "#dce3f0",
-        "accent": "#1a1f36",
+        "accent": "#111111",
         "muted": "#eef1f6",
         "muted_foreground": "#5c6478",
         "dark_bg": "#1a1f36",
@@ -76,6 +76,10 @@ SLIDE_HEIGHT = Inches(7.5)
 
 # 여백
 MARGIN = Inches(0.75)
+
+# 원라이너 영역 높이
+ONELINER_HEIGHT = Inches(0.5)
+SEPARATOR_HEIGHT = Inches(0.02)
 
 
 def hex_to_rgb(hex_color: str) -> RGBColor:
@@ -142,6 +146,38 @@ def get_dimensions():
     margin = MARGIN.inches
     content_width = width - (2 * margin)
     return width, height, margin, content_width
+
+
+def add_oneliner_with_separator(slide, data: Dict, palette: Dict, margin: float, content_width: float) -> float:
+    """원라이너와 구분선을 슬라이드 최상단에 추가하고, 콘텐츠 시작 Y 위치 반환"""
+    oneliner = data.get("oneliner", "")
+
+    if not oneliner:
+        # 원라이너가 없으면 기존 margin 위치부터 시작
+        return margin
+
+    # 원라이너 텍스트 (최상단) - 핵심 메시지이므로 크게
+    oneliner_y = margin * 0.5
+    add_text_box(
+        slide, margin, oneliner_y, content_width, 1.0,
+        oneliner,
+        FONTS["content"], 32, palette["muted_foreground"],
+        alignment=PP_ALIGN.LEFT
+    )
+
+    # 구분선 (원라이너 아래) - 더 두껍게
+    separator_y = oneliner_y + 1.1
+    line = slide.shapes.add_shape(
+        MSO_SHAPE.RECTANGLE,
+        Inches(margin), Inches(separator_y),
+        Inches(content_width), Inches(0.02)
+    )
+    line.fill.solid()
+    line.fill.fore_color.rgb = hex_to_rgb(palette["muted"])
+    line.line.fill.background()
+
+    # 콘텐츠 시작 Y 위치 반환 (구분선 아래)
+    return separator_y + 0.2
 
 
 def create_cover_slide(prs: Presentation, data: Dict, palette: Dict) -> None:
@@ -245,11 +281,14 @@ def create_stats_grid_slide(prs: Presentation, data: Dict, palette: Dict) -> Non
     background.fill.fore_color.rgb = hex_to_rgb(palette["surface"])
     background.line.fill.background()
 
+    # 원라이너 + 구분선 (최상단)
+    content_start_y = add_oneliner_with_separator(slide, data, palette, margin, content_width)
+
     # 슬라이드 제목
     add_text_box(
-        slide, margin, margin, content_width, 0.8,
+        slide, margin, content_start_y, content_width, 0.8,
         data.get("title", "핵심 지표"),
-        FONTS["display"], 32, palette["surface_foreground"],
+        FONTS["display"], 28, palette["accent"],
         bold=True
     )
 
@@ -260,7 +299,7 @@ def create_stats_grid_slide(prs: Presentation, data: Dict, palette: Dict) -> Non
     if num_stats > 0:
         # 그리드 계산 - 상대적 위치
         col_width = content_width / min(num_stats, 4)
-        start_y = height * 0.35
+        start_y = content_start_y + 1.3
 
         for i, stat in enumerate(stats[:4]):  # 최대 4개
             col_x = margin + (i * col_width)
@@ -297,11 +336,14 @@ def create_two_column_slide(prs: Presentation, data: Dict, palette: Dict) -> Non
     background.fill.fore_color.rgb = hex_to_rgb(palette["surface"])
     background.line.fill.background()
 
+    # 원라이너 + 구분선 (최상단)
+    content_start_y = add_oneliner_with_separator(slide, data, palette, margin, content_width)
+
     # 슬라이드 제목
     add_text_box(
-        slide, margin, margin, content_width, 0.8,
+        slide, margin, content_start_y, content_width, 0.8,
         data.get("title", "비교 분석"),
-        FONTS["display"], 32, palette["surface_foreground"],
+        FONTS["display"], 28, palette["accent"],
         bold=True
     )
 
@@ -310,8 +352,8 @@ def create_two_column_slide(prs: Presentation, data: Dict, palette: Dict) -> Non
     col_width = (content_width - gap) / 2
     left_x = margin
     right_x = margin + col_width + gap
-    header_y = height * 0.25
-    items_start_y = height * 0.35
+    header_y = content_start_y + 0.9
+    items_start_y = content_start_y + 1.5
 
     # 왼쪽 컬럼
     left_data = data.get("left", {})
@@ -363,19 +405,22 @@ def create_three_column_slide(prs: Presentation, data: Dict, palette: Dict) -> N
     background.fill.fore_color.rgb = hex_to_rgb(palette["surface"])
     background.line.fill.background()
 
+    # 원라이너 + 구분선 (최상단)
+    content_start_y = add_oneliner_with_separator(slide, data, palette, margin, content_width)
+
     # 슬라이드 제목
     add_text_box(
-        slide, margin, margin, content_width, 0.8,
+        slide, margin, content_start_y, content_width, 0.8,
         data.get("title", "핵심 기능"),
-        FONTS["display"], 32, palette["surface_foreground"],
+        FONTS["display"], 28, palette["accent"],
         bold=True
     )
 
     columns = data.get("columns", [])
     gap = 0.3
     col_width = (content_width - (2 * gap)) / 3
-    header_y = height * 0.28
-    desc_y = height * 0.38
+    header_y = content_start_y + 0.9
+    desc_y = content_start_y + 1.5
 
     for i, col in enumerate(columns[:3]):
         col_x = margin + (i * (col_width + gap))
@@ -411,19 +456,22 @@ def create_image_text_slide(prs: Presentation, data: Dict, palette: Dict) -> Non
     background.fill.fore_color.rgb = hex_to_rgb(palette["surface"])
     background.line.fill.background()
 
+    # 원라이너 + 구분선 (최상단)
+    content_start_y = add_oneliner_with_separator(slide, data, palette, margin, content_width)
+
     # 슬라이드 제목
     add_text_box(
-        slide, margin, margin, content_width, 0.8,
+        slide, margin, content_start_y, content_width, 0.8,
         data.get("title", "스토리텔링"),
-        FONTS["display"], 32, palette["surface_foreground"],
+        FONTS["display"], 28, palette["accent"],
         bold=True
     )
 
     # 2컬럼 계산
     gap = 0.5
     col_width = (content_width - gap) / 2
-    content_y = height * 0.25
-    content_height = height * 0.55
+    content_y = content_start_y + 0.9
+    content_height = height - content_y - margin
 
     # 이미지 영역 (왼쪽)
     image_path = data.get("image_path")
@@ -512,11 +560,14 @@ def create_content_slide(prs: Presentation, data: Dict, palette: Dict) -> None:
     background.fill.fore_color.rgb = hex_to_rgb(palette["surface"])
     background.line.fill.background()
 
+    # 원라이너 + 구분선 (최상단)
+    content_start_y = add_oneliner_with_separator(slide, data, palette, margin, content_width)
+
     # 슬라이드 제목
     add_text_box(
-        slide, margin, margin, content_width, 0.8,
+        slide, margin, content_start_y, content_width, 0.8,
         data.get("title", "제목"),
-        FONTS["display"], 32, palette["surface_foreground"],
+        FONTS["display"], 28, palette["accent"],
         bold=True
     )
 
@@ -525,8 +576,8 @@ def create_content_slide(prs: Presentation, data: Dict, palette: Dict) -> None:
     if isinstance(content, list):
         content = "\n".join([f"• {item}" for item in content])
 
-    content_y = height * 0.22
-    content_height = height * 0.65
+    content_y = content_start_y + 0.9
+    content_height = height - content_y - margin
     add_text_box(
         slide, margin, content_y, content_width, content_height,
         content,
