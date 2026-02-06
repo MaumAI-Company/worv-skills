@@ -48,14 +48,15 @@ description: >
 문서/PPT_20260205_01_Thor성능평가/
 ├── Thor_성능평가.pptx          # 최종 PPT
 ├── slides_config.json          # 슬라이드 설정
-├── images/                     # 수집된 이미지
+├── images/                     # 슬라이드용 이미지
 │   ├── nvidia_thor_soc.jpg
 │   ├── eagle_n_board.png
 │   └── ...
-└── preview/                    # 검토용 이미지 (선택)
-    ├── slide-01.png
-    ├── slide-02.png
-    └── ...
+├── preview/                    # 검토용 이미지
+│   ├── slide-01.png
+│   └── ...
+└── references/                 # 참조 자료 (PDF, 원본 문서 등)
+    └── source_document.pdf
 ```
 
 **폴더 생성 스크립트:**
@@ -142,6 +143,20 @@ curl -L -o "images/이미지명.jpg" "https://images.unsplash.com/photo-xxx?w=19
 - 각 원라이너는 독립적으로 읽어도 의미가 전달되어야 함
 - 전체 원라이너를 연결하면 발표의 핵심 스토리가 완성됨
 
+**콘텐츠 명확성 원칙 (중요!):**
+- 모호한 표현 금지: "대략적인 평균값" → "BF16, FP8, FP4 평균값"
+- 지시 대상을 명확히 명시: "이 수치" → "FPS 수치", "해당 결과" → "테스트 결과"
+- 숫자가 무엇을 의미하는지 반드시 명시 (단위 + 명칭 분리)
+- 앞 슬라이드 참조 시 구체적 대상 언급: "앞서 설명한 내용" → "Thor 테스트에서 확인한 12 FPS"
+
+**각주(footnotes) 원칙 (필수!):**
+- 전문 용어, 약어, 기술 개념은 **처음 등장하는 슬라이드에 각주로 설명**
+- 표기법: `*`, `**`, `***` 형식 사용
+- 각주는 슬라이드 **하단**에 10pt 회색 텍스트로 배치
+- 표지(cover)와 섹션(section) 슬라이드에는 각주 불필요
+- 같은 용어가 여러 슬라이드에 나오면 **처음 슬라이드에만** 각주 추가
+- 예시: `"footnotes": ["* VLA: Vision-Language-Action 모델", "** NPU: Neural Processing Unit"]`
+
 예시:
 ```json
 {
@@ -187,14 +202,16 @@ curl -L -o "images/이미지명.jpg" "https://images.unsplash.com/photo-xxx?w=19
       "title": "비교 제목",
       "oneliner": "A는 성능이 우수하지만 비용이 높고, B는 비용이 합리적이지만 성능이 낮습니다.",
       "left": {"heading": "좌측", "items": ["항목1", "항목2"]},
-      "right": {"heading": "우측", "items": ["항목1", "항목2"]}
+      "right": {"heading": "우측", "items": ["항목1", "항목2"]},
+      "footnotes": ["* 용어1: 설명", "** 용어2: 설명"]
     },
     {
       "layout": "image_text",
       "title": "이미지 슬라이드",
       "oneliner": "제품 A는 2000 TFLOPS의 최고 성능을 제공하는 표준 플랫폼입니다.",
       "image_path": "/absolute/path/to/images/image.png",
-      "text": "설명 텍스트"
+      "text": "설명 텍스트",
+      "footnotes": ["* TFLOPS: Tera Floating Point Operations Per Second"]
     },
     {
       "layout": "stats_grid",
@@ -287,6 +304,109 @@ curl -L -o "images/이미지명.jpg" "https://images.unsplash.com/photo-xxx?w=19
 ```
 
 레이아웃 상세: [`references/layouts.md`](references/layouts.md)
+
+### 사양 비교 슬라이드 원칙 (중요!)
+
+**사양/스펙 비교 시 대표 수치 1개를 선정하여 차트로 시각화**
+
+- "몇 배 차이"가 메시지일 때 특히 효과적
+- 비교 대상 중 강조할 항목에 highlight 적용
+- 텍스트 나열보다 시각적 비교가 직관적
+
+**차트 선택 기준:**
+- **bar_chart**: 2~5개 항목 비교, 값 차이 강조 (예: A0 64 TOPS vs B0 250 TOPS)
+- **pie_chart**: 전체 대비 비율 표현, 점유율 강조 (예: 시장점유율 60%)
+
+---
+
+### 차트 디자인 가이드 (필수!)
+
+#### 공통 원칙
+
+1. **자동차트 사용 금지** - 파워포인트 기본 차트 기능 대신 도형으로 직접 그리기
+2. **항목 5개 이내** - 초과 시 "기타"로 묶기
+3. **필수 항목** - 단위, 출처(있다면), 제목, 항목 이름
+
+#### 막대 그래프 (bar_chart)
+
+- Y축 눈금선 제거 - 깔끔한 디자인
+- 막대 위에 값 직접 표시
+- 하이라이트 대비색 사용 (회색 vs 청록색)
+- 단위 표시 "(단위: TOPS)" 오른쪽 상단
+- 각주로 약어 설명
+
+```json
+{
+  "layout": "bar_chart",
+  "title": "A0 vs B0 연산 성능 비교",
+  "oneliner": "B0는 A0 대비 약 4배의 NPU 연산 성능을 제공합니다.",
+  "unit": "TOPS",
+  "highlight": 1,
+  "bars": [
+    {"label": "A0", "value": 64},
+    {"label": "B0", "value": 250}
+  ],
+  "footnotes": ["* TOPS: Tera Operations Per Second"]
+}
+```
+
+#### 원형 그래프 (pie_chart)
+
+- **12시 정각 기준 오른쪽 배치** - 가장 큰 조각부터 시계방향 순차 배치
+- **중요 조각 강조** - 색상/채도로 구분, 강조 조각에 라벨+값 크게 표시
+- **파이 조각 5개 이내** - 초과 시 작은 항목들을 "기타"로 묶기
+- **중앙 빈 공간(도넛)** - 강조 항목 라벨을 중앙에 배치 가능
+
+```json
+{
+  "layout": "pie_chart",
+  "title": "2022년 국내 주요 대도시 인구 비교 현황",
+  "oneliner": "서울이 전체 인구의 60%를 차지하며 압도적인 비중을 보입니다.",
+  "unit": "%",
+  "highlight": 0,
+  "slices": [
+    {"label": "서울", "value": 60},
+    {"label": "부산", "value": 30},
+    {"label": "기타", "value": 10}
+  ],
+  "source": "통계청",
+  "footnotes": []
+}
+```
+
+#### 테이블 (table)
+
+다차원 데이터 비교에 적합. 여러 항목의 여러 속성을 한눈에 비교.
+
+**디자인 원칙:**
+- 모든 선 0.5pt (색상: rgb 127,127,127)
+- 양 옆 선 제거 (좌우 테두리 없음)
+- 상단/왼쪽 항목 굵게 (헤더 row/column bold)
+- 상단 테두리선 1.5pt (헤더 아래 강조선)
+- 헤더 배경 연한 색 (채도 낮은 톤)
+- 강조 행 하이라이트 (배경색으로 차별화)
+- 필수 정보: 제목, 단위, 출처
+
+```json
+{
+  "layout": "table",
+  "title": "Quantization 방식별 성능 비교",
+  "oneliner": "FP8이 메모리 효율과 성능 모두에서 최적의 선택입니다.",
+  "unit": "GiB / ms / TPS",
+  "headers": ["", "BF16", "FP8", "FP4"],
+  "highlight_row": 3,
+  "rows": [
+    {"label": "메모리", "values": ["1.76 GiB", "1.15 GiB", "0.88 GiB"]},
+    {"label": "Prefill", "values": ["24 ms", "21 ms", "23 ms"]},
+    {"label": "Decode", "values": ["123 TPS", "196 TPS", "180 TPS"]},
+    {"label": "FPS", "values": ["8.25", "12", "11.12"]}
+  ],
+  "source": "",
+  "footnotes": ["* TPS: Tokens Per Second"]
+}
+```
+
+---
 
 ### 비즈니스 표현 가이드
 
