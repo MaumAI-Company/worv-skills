@@ -6,6 +6,14 @@ description: >
   python-pptx 기반, Pretendard/Noto Serif KR 폰트, 3가지 컬러 팔레트(Sage/Mono/Navy),
   7가지 레이아웃 패턴 제공. 미니멀하고 고급스러운 디자인 스타일.
   이미지 검색/다운로드, 프로젝트 맥락 파악, 검토 루프까지 통합된 E2E 워크플로우.
+allowed-tools:
+  - Bash
+  - Read
+  - Write
+  - Glob
+  - Grep
+  - WebSearch
+  - WebFetch
 ---
 
 # PPT Generator - 한국어 프레젠테이션 생성 스킬
