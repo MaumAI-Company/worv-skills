@@ -150,6 +150,33 @@ PERSON_DICTIONARY_PATH=~/obsidian/20_Areas/00_인물사전/
 - **gcp-vm-create**: GCP VM 생성 마법사
 - **gcp-project-setup**: GCP 프로젝트 생성/설정 자동화
 
+### 📊 대시보드 (플러그인)
+- **claude-dashboard**: Claude Code 상태 표시줄 (모델, 컨텍스트 사용량, API rate limit, 비용 추적, 한/영 지원)
+
+---
+
+## 플러그인 설치
+
+플러그인은 `plugins/` 디렉토리에 있으며, 스킬과 설치 방법이 다릅니다.
+
+### claude-dashboard
+
+```bash
+# 레포 클론
+git clone https://github.com/MaumAI-Company/worv-skills.git /tmp/worv-skills
+
+# 플러그인 복사
+cp -r /tmp/worv-skills/plugins/claude-dashboard ~/.claude/plugins/claude-dashboard
+
+# 설정 (Claude Code 내에서)
+/claude-dashboard:setup
+
+# 정리
+rm -rf /tmp/worv-skills
+```
+
+자세한 설정 방법은 `plugins/claude-dashboard/README.md`를 참고하세요.
+
 ---
 
 ## 기여 가이드

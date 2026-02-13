@@ -1,0 +1,36 @@
+{
+  "model": {
+    "opus": "Opus",
+    "sonnet": "Sonnet",
+    "haiku": "Haiku"
+  },
+  "labels": {
+    "5h": "5h",
+    "7d": "7d",
+    "7d_all": "7d",
+    "7d_sonnet": "7d-S"
+  },
+  "time": {
+    "days": "d",
+    "hours": "h",
+    "minutes": "m",
+    "seconds": "s"
+  },
+  "errors": {
+    "no_context": "No context yet"
+  },
+  "widgets": {
+    "tools": "Tools",
+    "done": "done",
+    "running": "running",
+    "agent": "Agent",
+    "todos": "Todos",
+    "claudeMd": "CLAUDE.md",
+    "rules": "Rules",
+    "mcps": "MCP",
+    "hooks": "Hooks",
+    "burnRate": "Rate",
+    "cache": "Cache",
+    "toLimit": "to"
+  }
+}
