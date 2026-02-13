@@ -1,7 +1,7 @@
 ---
 name: gmail-sender
 description: Gmail API를 통해 이메일을 발송합니다. 커피챗 리마인더, 후속 연락, 네트워킹 메일 발송에 활용.
-version: 1.0.0
+version: 1.1.0
 author: claude
 triggers:
   - 메일 보내줘
@@ -20,8 +20,9 @@ Gmail API를 활용하여 이메일을 발송하는 스킬입니다.
 ## 주요 기능
 
 1. **이메일 발송** - 수신자, 제목, 본문 지정하여 발송
-2. **미리보기** - 발송 전 내용 확인 (dry-run)
-3. **확인 프롬프트** - 실수 방지를 위한 발송 전 확인
+2. **첨부파일 지원** - `--attachment` 옵션으로 파일 첨부 (여러 개 가능)
+3. **미리보기** - 발송 전 내용 확인 (dry-run)
+4. **확인 프롬프트** - 실수 방지를 위한 발송 전 확인
 
 ## 사전 설정 (최초 1회)
 
@@ -30,8 +31,8 @@ Gmail API를 활용하여 이메일을 발송하는 스킬입니다.
 기존 OAuth 클라이언트가 있으면 발송용 토큰만 새로 생성하면 됩니다.
 
 ```bash
-source /Users/inkeun/projects/obsidian/.venv/bin/activate && \
-  python /Users/inkeun/projects/obsidian/.claude/skills/gmail-sender/scripts/gmail_client.py
+source ~/.claude/.venv/bin/activate && \
+  python ~/.claude/skills/gmail-sender/scripts/gmail_client.py
 ```
 
 - 브라우저가 열리고 Google 계정 로그인 요청
@@ -43,7 +44,7 @@ source /Users/inkeun/projects/obsidian/.venv/bin/activate && \
 1. [Google Cloud Console](https://console.cloud.google.com/) 접속
 2. **APIs & Services > Library**에서 **Gmail API** 활성화
 3. **APIs & Services > Credentials**에서 OAuth client ID 생성 (Desktop app)
-4. JSON 다운로드 → `/Users/inkeun/projects/obsidian/.creds/oauth_client.json`
+4. JSON 다운로드 → `~/.claude/.creds/oauth_client.json`
 5. 위 명령어로 인증 실행
 
 ## 사용법
@@ -51,8 +52,8 @@ source /Users/inkeun/projects/obsidian/.venv/bin/activate && \
 ### 기본 발송
 
 ```bash
-source /Users/inkeun/projects/obsidian/.venv/bin/activate && \
-  python /Users/inkeun/projects/obsidian/.claude/skills/gmail-sender/scripts/send_email.py \
+source ~/.claude/.venv/bin/activate && \
+  python ~/.claude/skills/gmail-sender/scripts/send_email.py \
     --to "recipient@example.com" \
     --subject "제목" \
     --body "본문 내용"
@@ -78,6 +79,25 @@ python .claude/skills/gmail-sender/scripts/send_email.py \
   --yes
 ```
 
+### 첨부파일 포함 발송
+
+```bash
+# 단일 첨부
+python .claude/skills/gmail-sender/scripts/send_email.py \
+  --to "recipient@example.com" \
+  --subject "자료 공유드립니다" \
+  --body "첨부파일 확인 부탁드립니다." \
+  --attachment /path/to/document.pdf
+
+# 여러 첨부파일
+python .claude/skills/gmail-sender/scripts/send_email.py \
+  --to "recipient@example.com" \
+  --subject "자료 공유드립니다" \
+  --body "첨부파일 확인 부탁드립니다." \
+  --attachment /path/to/file1.pdf \
+  --attachment /path/to/file2.xlsx
+```
+
 ### 파일에서 본문 읽기
 
 ```bash
@@ -93,7 +113,7 @@ python .claude/skills/gmail-sender/scripts/send_email.py \
 ### 1. 커피챗 리마인더
 
 ```bash
-source /Users/inkeun/projects/obsidian/.venv/bin/activate && \
+source ~/.claude/.venv/bin/activate && \
   python .claude/skills/gmail-sender/scripts/send_email.py \
     --to "stashby.me@gmail.com" \
     --subject "[리마인더] 오늘 17시 커피챗 안내드립니다" \
@@ -151,13 +171,13 @@ python .claude/skills/gmail-sender/scripts/send_email.py \
 
 ```bash
 # 루트 venv에 설치 (gmail-reader와 동일)
-source /Users/inkeun/projects/obsidian/.venv/bin/activate
+source ~/.claude/.venv/bin/activate
 pip install google-api-python-client google-auth-httplib2 google-auth-oauthlib
 ```
 
 ## 필수 규칙: 발송 전 사용자 확인
 
-**⚠️ 이메일 발송 전 반드시 사용자 확인을 받아야 합니다.**
+이메일 발송 전 반드시 사용자 확인을 받아야 합니다.
 
 Claude는 이메일을 발송하기 전에 다음 정보를 보여주고 확인을 받아야 합니다:
 
@@ -167,7 +187,7 @@ Claude는 이메일을 발송하기 전에 다음 정보를 보여주고 확인�
 
 **확인 형식 예시:**
 ```
-📧 이메일을 발송합니다:
+이메일을 발송합니다:
 - 수신자: recipient@example.com
 - 제목: [리마인더] 오늘 17시 커피챗 안내드립니다
 - 본문:
@@ -195,7 +215,7 @@ Claude는 이메일을 발송하기 전에 다음 정보를 보여주고 확인�
 ### "Insufficient Permission" 오류
 → 기존 토큰에 발송 권한이 없음. 토큰 삭제 후 재인증:
 ```bash
-rm /Users/inkeun/projects/obsidian/.creds/gmail_send_token.pickle
+rm ~/.claude/.creds/gmail_send_token.pickle
 python .claude/skills/gmail-sender/scripts/gmail_client.py
 ```
 
