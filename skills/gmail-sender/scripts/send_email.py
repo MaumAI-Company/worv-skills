@@ -117,12 +117,12 @@ def main():
     attachments = args.attachment or []
     for att in attachments:
         if not os.path.exists(att):
-            print(f"❌ 첨부 파일을 찾을 수 없습니다: {att}", file=sys.stderr)
+            print(f"첨부 파일을 찾을 수 없습니다: {att}", file=sys.stderr)
             sys.exit(1)
 
     # 미리보기 출력
     print("=" * 50)
-    print("📧 이메일 미리보기")
+    print("이메일 미리보기")
     print("=" * 50)
     print(f"From: {sender}")
     print(f"To: {args.to}")
@@ -150,10 +150,10 @@ def main():
     # 발송
     try:
         result = send_email(service, args.to, args.subject, body, attachments=attachments)
-        print(f"\n✅ 발송 완료!")
+        print(f"\n발송 완료!")
         print(f"   Message ID: {result.get('id')}")
     except Exception as e:
-        print(f"\n❌ 발송 실패: {e}", file=sys.stderr)
+        print(f"\n발송 실패: {e}", file=sys.stderr)
         sys.exit(1)
 
 
